@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Http\Request;
@@ -50,6 +51,15 @@ Route::group(['prefix' => 'brand'], function () {
     Route::get('/', [BrandController::class,'show']);
     Route::get('/all', [BrandController::class, 'all']);
 
+});
+
+// Categories Routes
+Route::group(['prefix' => 'category'], function () {
+    Route::post('/create', [CategoryController::class,'store'])->middleware('jwt.verify', 'permission:CREATE_CATEGORY');
+    Route::post('/update', [CategoryController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_CATEGORY');
+    Route::delete('/delete', [CategoryController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_CATEGORY');
+    Route::get('/', [CategoryController::class,'show']);
+    Route::get('/all', [CategoryController::class, 'all']);
 });
 
 

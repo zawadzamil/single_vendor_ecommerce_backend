@@ -7,11 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class ResponseHelper
 {
 
-    public function created($response, $model){
+    public function created($response, $model): \Illuminate\Http\JsonResponse
+    {
         return response()->json([
            'message' =>$model .' created successfully.',
             'data' => $response
         ],201);
+    }
+    public function updated($response, $model): \Illuminate\Http\JsonResponse
+    {
+        return response()->json([
+          'message' =>$model.' updated successfully.',
+            'data' => $response
+        ],200);
     }
     public function success($response): \Illuminate\Http\JsonResponse
     {

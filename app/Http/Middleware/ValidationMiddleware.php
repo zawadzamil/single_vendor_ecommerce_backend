@@ -30,6 +30,7 @@ class ValidationMiddleware
             'email_or_username'=>'required|string|max:200',
             'permission_name'=>'required|string|max:200|unique:permissions,name',
             'role_name'=>'required|max:200|min:2|string',
+            'slug'=>'required|max:200|min:2|string',
             'permission'=>'max:5000',
             'image' => 'required|image|mimes:png,jpg,gif,svg|max:2048',
             'address' => 'required|string|max:500|min:2',

@@ -5,5 +5,7 @@ return [
     'customer_deleted' => 'Customer has been deleted.',
     'permission_not_found' => 'The following permissions are not found : ',
     'not_found'=> 'not found.',
-    'deleted'=>'deleted successfully.'
+    'deleted'=>'deleted successfully.',
+    'parent_category_error' => 'Parent category not found.',
+    'parent_category_same' => 'Child category cannot be the same as parent category'
 ];
