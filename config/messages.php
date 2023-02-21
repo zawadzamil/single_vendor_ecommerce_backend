@@ -7,5 +7,6 @@ return [
     'not_found'=> 'not found.',
     'deleted'=>'deleted successfully.',
     'parent_category_error' => 'Parent category not found.',
-    'parent_category_same' => 'Child category cannot be the same as parent category'
+    'parent_category_same' => 'Child category cannot be the same as parent category',
+    'cant_delete_category'=>'Cannot delete this category. It has children categories',
 ];

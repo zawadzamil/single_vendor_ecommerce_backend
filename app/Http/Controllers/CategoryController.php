@@ -155,11 +155,28 @@ class CategoryController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function destroy(Category $category)
+    public function destroy(Request $request)
     {
-        //
+        $id = $request->query('id');
+        if(!$id){
+            return $this->responseHelper->error('Category '.config('messages.id_required'),400);
+        }
+
+        $category = $this->dbHelper->getDocument($id);
+        if(!$category){
+            return $this->responseHelper->error('Category '.config('messages.not_found'),404);
+        }
+
+        $hasChildren = $category->children()->exists();
+        if($hasChildren){
+            return $this->responseHelper->error(config('messages.cant_delete_category'),400);
+        }
+
+        $this->dbHelper->deleteDocument($id);
+
+        return $this->responseHelper->success('Category '.config('messages.deleted'));
     }
 
     /**

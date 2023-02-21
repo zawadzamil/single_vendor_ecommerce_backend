@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Ramsey\Uuid\Uuid;
 
-class Brand extends Model
+class Offer extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,SoftDeletes;
+
     protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -26,16 +27,14 @@ class Brand extends Model
     protected $fillable = [
         'name',
         'description',
-        'image',
-        'created_by'
-        ];
+        'discount',
+        'start_date',
+        'end_date',
+       'created_by',
+        'status'
+    ];
 
-    // Created By
-    public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-    public function product(){
-        return $this->belongsTo(Product::class);
+    public function products(){
+        return $this->hasMany(Product::class);
     }
 }

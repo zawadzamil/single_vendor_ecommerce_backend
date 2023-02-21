@@ -50,6 +50,10 @@ class ValidationMiddleware
             'date' => 'required|date_format:d/m/Y',
             'start_time' => 'required|date_format:h:i A',
             'end_time' => 'required|date_format:h:i A|after:start_time',
+            'category_id'=>'required|string|min:2|max:50',
+            'brand_id'=>'required|string|min:2|max:50',
+            'offer_id'=>'required|string|min:2|max:50',
+
 
 
         ];

@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,15 @@ Route::group(['prefix' => 'category'], function () {
     Route::delete('/delete', [CategoryController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_CATEGORY');
     Route::get('/', [CategoryController::class,'show']);
     Route::get('/all', [CategoryController::class, 'all']);
+});
+
+//Products Routes
+Route::group(['prefix' => 'product'], function () {
+    Route::post('/create', [ProductController::class,'store'])->middleware('jwt.verify', 'permission:CREATE_PRODUCT');
+    Route::post('/update', [ProductController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_PRODUCT');
+    Route::delete('/delete', [ProductController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_PRODUCT');
+    Route::get('/', [ProductController::class,'show']);
+    Route::get('/all', [ProductController::class, 'all']);
 });
 
 
