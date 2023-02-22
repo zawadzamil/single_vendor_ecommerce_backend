@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
             $table->boolean('status')->default(false);
-            $table->uuid('created_by');
+            $table->integer('created_by');
             $table->timestamps();
             $table->softDeletes();
         });

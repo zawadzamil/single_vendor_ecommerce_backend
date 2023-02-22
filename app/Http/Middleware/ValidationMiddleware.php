@@ -53,6 +53,7 @@ class ValidationMiddleware
             'category_id'=>'required|string|min:2|max:50',
             'brand_id'=>'required|string|min:2|max:50',
             'offer_id'=>'required|string|min:2|max:50',
+            'gender'=>'required|string|in:male,female',
 
 
 

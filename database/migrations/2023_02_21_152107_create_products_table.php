@@ -23,7 +23,7 @@ return new class extends Migration
             $table->uuid('offer_id')->nullable();
             $table->string('slug')->unique();
             $table->string('gender')->nullable();
-            $table->uuid('created_by');
+            $table->integer('created_by');
             $table->foreign('category_id')->references('id')->on('categories');
             $table->foreign('brand_id')->references('id')->on('brands');
             $table->foreign('offer_id')->references('id')->on('offers');

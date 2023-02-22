@@ -49,4 +49,17 @@ class dbHelper
         $limit = ceil($total / $per_page);
         return ["data"=>$docs,"total" => $total, "per_page" => $per_page,"limit"=>$limit];
     }
+
+    public function idValidate($array,$request): array
+    {
+        foreach($array as $key => $value){
+            if($request->has($key)){
+                $data = $value::find($request->$key);
+                if(!$data){
+                    return ['success'=>false,'message'=>'No data found for this '.$key.'.'];
+                }
+            }
+        }
+        return ['success'=>true];
+    }
 }

@@ -6,7 +6,9 @@ use App\Enums\GenderEnum;
 use App\Helpers\dbHelper;
 use App\Helpers\FillableChecker;
 use App\Helpers\ResponseHelper;
+use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Offer;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -63,6 +65,23 @@ class ProductController extends Controller
             return $this->responseHelper->error($fillableChecker['message'],400);
         }
 
+//        if($request->has('category_id')){
+//            $category = Category::find($request->category_id);
+//            if(!$category){
+//                return $this->responseHelper->error('Invalid category',400);
+//            }
+//        }
+        // Ids Validation
+        $idMap = [
+            'category_id' => Category::class,
+            'brand_id' => Brand::class,
+            'offer_id'=> Offer::class,
+        ];
+
+        $idValidationResult = $this->dbHelper->idValidate($idMap, $request);
+        if(!$idValidationResult['success']){
+            return $this->responseHelper->error($idValidationResult['message'], 404);
+        }
         try {
             $product = $this->dbHelper->createDocument([
                 'name' => $request->name,
@@ -111,21 +130,70 @@ class ProductController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param \App\Models\Product $product
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request)
     {
-        //
+        $id = $request->query('id');
+        if (!$id) {
+            return $this->responseHelper->error(config('Product '.'messages.id_required'),400);
+        }
+
+        $product = $this->dbHelper->getDocument($id);
+        if(!$product) {
+            return $this->responseHelper->error('Product '.config('messages.not_found'),404);
+        }
+
+        $idMap = [
+            'category_id' => Category::class,
+            'brand_id' => Brand::class,
+            'offer_id'=> Offer::class,
+        ];
+        $idValidationResult = $this->dbHelper->idValidate($idMap, $request);
+        if(!$idValidationResult['success']){
+            return $this->responseHelper->error($idValidationResult['message'], 404);
+        }
+
+        try {
+            $product = $this->dbHelper->updateDocument($id,[
+                "name" => $request->name ?? $product->name,
+                "price" => $request->price?? $product->price,
+                "slug" => $request->slug?? $product->slug,
+                "description" => $request->description?? $product->description,
+                "category_id" => $request->category_id?? $product->category_id,
+                "brand_id" => $request->brand_id?? $product->brand_id,
+                "offer_id" => $request->offer_id?? $product->offer_id,
+                "gender" => $request->gender?? $product->gender,
+
+            ]);
+            return $this->responseHelper->updated($product,'Product');
+        }
+        catch (\Exception $e) {
+            return $this->responseHelper->error($e->errorInfo[2]?? $e->getMessage(),400);
+
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param \App\Models\Product $product
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Product $product)
+    public function destroy(Request $request)
     {
-        //
+        $id = $request->query('id');
+        if (!$id) {
+            return $this->responseHelper->error(config('Product '.'messages.id_required'),400);
+        }
+
+        $product = $this->dbHelper->getDocument($id);
+        if(!$product) {
+            return $this->responseHelper->error('Product '.config('messages.not_found'),404);
+        }
+        $this->dbHelper->deleteDocument($id);
+        return $this->responseHelper->success('Product '.config('messages.deleted'));
+
+
     }
 }
