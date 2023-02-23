@@ -14,7 +14,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('product_variations', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->uuid('product_id');
+            $table->string('color')->nullable();
+            $table->string('size')->nullable();
+            $table->integer('created_by');
+            $table->foreign('product_id', )->references('id')->on('products')->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

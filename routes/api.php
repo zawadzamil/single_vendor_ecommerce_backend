@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductVariationController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,15 @@ Route::group(['prefix' => 'product'], function () {
     Route::delete('/delete', [ProductController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_PRODUCT');
     Route::get('/', [ProductController::class,'show']);
     Route::get('/list', [ProductController::class, 'all']);
+});
+
+// Product Variant Routes
+Route::group(['prefix' => 'product-variant'], function () {
+    Route::post('/create', [ProductVariationController::class,'store'])->middleware('jwt.verify', 'permission:CREATE_PRODUCT_VARIANT');
+    Route::post('/update', [ProductVariationController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_PRODUCT_VARIANT');
+    Route::delete('/delete', [ProductVariationController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_PRODUCT_VARIANT');
+    Route::get('/', [ProductVariationController::class,'show']);
+    Route::get('/list', [ProductVariationController::class, 'all']);
 });
 
 

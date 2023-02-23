@@ -11,6 +11,7 @@ use Ramsey\Uuid\Uuid;
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
+
     protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -25,11 +26,11 @@ class Product extends Model
         'gender',
         'slug',
         'created_by'
-        ];
-    protected $casts = [
-        'gender'=>GenderEnum::class
     ];
-    protected $hidden = ['created_by', 'created_at', 'updated_at','deleted_at'];
+    protected $casts = [
+        'gender' => GenderEnum::class
+    ];
+    protected $hidden = ['created_by', 'created_at', 'updated_at', 'deleted_at'];
 
     protected static function boot()
     {
@@ -40,16 +41,26 @@ class Product extends Model
         });
     }
 
+    public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
+
     public function brand(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Brand::class);
     }
+
     public function offer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Offer::class);
+    }
+    public  function variant(){
+        return $this->hasMany(ProductVariation::class);
     }
 }
