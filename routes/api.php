@@ -50,7 +50,7 @@ Route::group(['prefix' => 'brand'], function () {
     Route::post('/update', [BrandController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_BRAND');
     Route::delete('/delete', [BrandController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_BRAND');
     Route::get('/', [BrandController::class,'show']);
-    Route::get('/all', [BrandController::class, 'all']);
+    Route::get('/list', [BrandController::class, 'all']);
 
 });
 
@@ -60,7 +60,7 @@ Route::group(['prefix' => 'category'], function () {
     Route::post('/update', [CategoryController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_CATEGORY');
     Route::delete('/delete', [CategoryController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_CATEGORY');
     Route::get('/', [CategoryController::class,'show']);
-    Route::get('/all', [CategoryController::class, 'all']);
+    Route::get('/list', [CategoryController::class, 'all']);
 });
 
 //Products Routes
@@ -69,7 +69,7 @@ Route::group(['prefix' => 'product'], function () {
     Route::post('/update', [ProductController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_PRODUCT');
     Route::delete('/delete', [ProductController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_PRODUCT');
     Route::get('/', [ProductController::class,'show']);
-    Route::get('/all', [ProductController::class, 'all']);
+    Route::get('/list', [ProductController::class, 'all']);
 });
 
 

@@ -62,4 +62,50 @@ class dbHelper
         }
         return ['success'=>true];
     }
+    public function findByIdValidate($request): array
+    {
+        $modelName = class_basename($this->model);
+        $id = $request->query('id');
+        if(!$id){
+            return ['success'=>false,'message'=>$modelName. ' Id required in request query.','status'=>400];
+        }
+
+        $data  = $this->model::find($id);
+
+        if(!$data){
+            return ['success'=>false,'message'=>$modelName.' not found.','status'=>404];
+        }
+        return ['success'=>true,'data'=>$data];
+    }
+
+    public function getProducts($request): array
+    {
+        $per_page = (int)$request->per_page ?? 5;
+        $page = $request -> query('page') ?? 1;
+        $sort = $request->query('sort') ?? 'desc';
+        $order = $request->query('orderBy') ?? 'created_at';
+        $skip = ($page - 1) * $per_page;
+        $filter = [];
+        $keysToCheck = ['name', 'category_id', 'brand_id','gender'];
+
+        foreach ($keysToCheck as $key) {
+            if ($request->has($key)) {
+                $filter[$key] = $request->input($key);
+            }
+        }
+
+        $minPrice = $request->query('minPrice') ?? 0;
+        $maxPrice = $request->query('maxPrice')?? 999999999999999;
+
+        if(count($filter) == 0){
+            $docs = $this->model::orderBy($order, $sort)->skip($skip)->whereBetween('price', [$minPrice, $maxPrice])->take($per_page)->get();
+            $total = $this->model::orderBy($order, $sort)->whereBetween('price', [$minPrice, $maxPrice])->count();
+        }
+        else{
+            $docs = $this->model::where($filter)->orderBy($order, $sort)->skip($skip)->whereBetween('price', [$minPrice, $maxPrice])->take($per_page)->get();
+            $total = $this->model::where($filter)->orderBy($order, $sort)->whereBetween('price', [$minPrice, $maxPrice])->count();
+        }
+        $limit = ceil($total / $per_page);
+        return ["data"=>$docs,"total" => $total, "per_page" => $per_page,"limit"=>$limit];
+    }
 }

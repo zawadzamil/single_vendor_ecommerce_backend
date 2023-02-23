@@ -107,11 +107,32 @@ class ProductController extends Controller
      * Display the specified resource.
      *
      * @param \App\Models\Product $product
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Product $product)
+    public function show(Request $request): \Illuminate\Http\JsonResponse
     {
-        //
+       $idValidate = $this->dbHelper->findByIdValidate($request);
+
+       if(!$idValidate['success']){
+           return $this->responseHelper->error($idValidate['message'], $idValidate['status']);
+       }
+      $product = $idValidate['data'];
+
+       if($product['category_id']){
+           $category = Category::find($product['category_id']);
+           $product->categoryName = $category->name;
+       }
+       if($product['brand_id']){
+           $brand = Brand::find($product['brand_id']);
+           $product->brandName = $brand->name;
+       }
+
+//       if($product['offer_id']){
+//           $offer = Offer::find($product['offer_id']);
+//           $product->offerName = $offer->name;
+//       }
+
+        return $this->responseHelper->success($product);
     }
 
     /**
@@ -180,7 +201,7 @@ class ProductController extends Controller
      * @param \App\Models\Product $product
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): \Illuminate\Http\JsonResponse
     {
         $id = $request->query('id');
         if (!$id) {
@@ -193,7 +214,26 @@ class ProductController extends Controller
         }
         $this->dbHelper->deleteDocument($id);
         return $this->responseHelper->success('Product '.config('messages.deleted'));
+    }
 
+    /**
+     * Get List of products.
+     *
+     * @param \App\Models\Product $product
+     * @return \Illuminate\Http\JsonResponse
+     **/
 
+    //Get All products
+    public function all(Request $request){
+        try {
+            $products = $this->dbHelper->getProducts($request);
+            if ($products['total'] == 0) {
+                return $this->responseHelper->error('Products ' . config('messages.not_found'), 404);
+            }
+            return response()->json($products);
+        }
+        catch (\Exception $e) {
+            return $this->responseHelper->error($e->getMessage(),400);
+        }
     }
 }
