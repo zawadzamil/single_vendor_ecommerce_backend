@@ -23,7 +23,14 @@ class ProductVariation extends Model
         'created_by'
     ];
 
-    protected $hidden = ['created_by', 'created_at', 'updated_at', 'deleted_at'];
+    protected $casts = [
+        'color' => 'array',
+        'size' => 'array',
+    ];
+
+
+
+    protected $hidden = ['created_by', 'created_at', 'updated_at', 'deleted_at','id','product_id'];
 
     protected static function boot()
     {

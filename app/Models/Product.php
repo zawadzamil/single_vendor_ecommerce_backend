@@ -61,6 +61,6 @@ class Product extends Model
         return $this->belongsTo(Offer::class);
     }
     public  function variant(){
-        return $this->hasMany(ProductVariation::class);
+        return $this->hasOne(ProductVariation::class);
     }
 }

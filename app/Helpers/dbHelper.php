@@ -98,13 +98,14 @@ class dbHelper
         $maxPrice = $request->query('maxPrice')?? 999999999999999;
 
         if(count($filter) == 0){
-            $docs = $this->model::orderBy($order, $sort)->skip($skip)->whereBetween('price', [$minPrice, $maxPrice])->take($per_page)->get();
+            $docs = $this->model::orderBy($order, $sort)->skip($skip)->whereBetween('price', [$minPrice, $maxPrice])->with('variant')->take($per_page)->get();
             $total = $this->model::orderBy($order, $sort)->whereBetween('price', [$minPrice, $maxPrice])->count();
         }
         else{
-            $docs = $this->model::where($filter)->orderBy($order, $sort)->skip($skip)->whereBetween('price', [$minPrice, $maxPrice])->take($per_page)->get();
+            $docs = $this->model::where($filter)->orderBy($order, $sort)->skip($skip)->whereBetween('price', [$minPrice, $maxPrice])->with('variant')->take($per_page)->get();
             $total = $this->model::where($filter)->orderBy($order, $sort)->whereBetween('price', [$minPrice, $maxPrice])->count();
         }
+
         $limit = ceil($total / $per_page);
         return ["data"=>$docs,"total" => $total, "per_page" => $per_page,"limit"=>$limit];
     }
