@@ -121,40 +121,52 @@ class dbHelper
                         $query->whereJsonContains('color', $color)
                             ->whereJsonContains('size', $size);
                     })->count();
+
             } else {
-                if ($request->has('color') || $request->has('size')) {
-                    $docs = $this->model::orderBy($order, $sort)
-                        ->skip($skip)
-                        ->whereBetween('price', [$minPrice, $maxPrice])
-                        ->whereHas('variant', function ($query) use ($color, $size) {
-                            $query->whereJsonContains('color', $color)
-                                ->whereJsonContains('size', $size);
-                        })->with('variant')->take($per_page)->get();
+                $docs = $this->model::orderBy($order, $sort)
+                    ->skip($skip)
+                    ->whereBetween('price', [$minPrice, $maxPrice])
+                    ->with('variant')
+                    ->take($per_page)
+                    ->get();
 
-                    $total = $this->model::orderBy($order, $sort)
-                        ->whereBetween('price', [$minPrice, $maxPrice])
-                        ->whereHas('variant', function ($query) use ($color, $size) {
-                            $query->whereJsonContains('color', $color)
-                                ->whereJsonContains('size', $size);
-                        })->count();
-                } else {
-                    $docs = $this->model::orderBy($order, $sort)
-                        ->skip($skip)
-                        ->whereBetween('price', [$minPrice, $maxPrice])
-                        ->with('variant')
-                        ->take($per_page)
-                        ->get();
-
-                    $total = $this->model::orderBy($order, $sort)
-                        ->whereBetween('price', [$minPrice, $maxPrice])
-                        ->count();
-                }
+                $total = $this->model::orderBy($order, $sort)
+                    ->whereBetween('price', [$minPrice, $maxPrice])
+                    ->count();
             }
 
 
-        } else {
-            $docs = $this->model::where($filter)->orderBy($order, $sort)->skip($skip)->whereBetween('price', [$minPrice, $maxPrice])->with('variant')->take($per_page)->get();
-            $total = $this->model::where($filter)->orderBy($order, $sort)->whereBetween('price', [$minPrice, $maxPrice])->count();
+        }
+        else {
+            if ($request->has('color') || $request->has('size')) {
+                $docs = $this->model::where($filter)->orderBy($order, $sort)
+                    ->skip($skip)
+                    ->whereBetween('price', [$minPrice, $maxPrice])
+                    ->whereHas('variant', function ($query) use ($color, $size) {
+                        $query->whereJsonContains('color', $color)
+                            ->whereJsonContains('size', $size);
+                    })
+                    ->with('variant')->take($per_page)->get();
+
+                $total = $this->model::where($filter)->orderBy($order, $sort)
+                    ->whereBetween('price', [$minPrice, $maxPrice])
+                    ->whereHas('variant', function ($query) use ($color, $size) {
+                        $query->whereJsonContains('color', $color)
+                            ->whereJsonContains('size', $size);
+                    })->count();
+
+            } else {
+                $docs = $this->model::where($filter)->orderBy($order, $sort)
+                    ->skip($skip)
+                    ->whereBetween('price', [$minPrice, $maxPrice])
+                    ->with('variant')
+                    ->take($per_page)
+                    ->get();
+
+                $total = $this->model::where($filter)->orderBy($order, $sort)
+                    ->whereBetween('price', [$minPrice, $maxPrice])
+                    ->count();
+            }
         }
 
         $limit = ceil($total / $per_page);
