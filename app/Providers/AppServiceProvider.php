@@ -14,6 +14,10 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
+
+        define('ALLOWED_COLORS', ['red', 'green', 'blue', 'white', 'purple','black', 'orange','gray', 'yellow','navy','brown','cream','maroon','pink','purple']);
+
+        define('ALLOWED_SIZES',['XS','S','M','L','XL','XXL','XXXL']);
     }
 
     /**

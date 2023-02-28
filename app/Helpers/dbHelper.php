@@ -96,6 +96,7 @@ class dbHelper
 
         $minPrice = $request->query('minPrice') ?? 0;
         $maxPrice = $request->query('maxPrice')?? 999999999999999;
+        $color = $request->query('color') ?? ALLOWED_COLORS;
 
         if(count($filter) == 0){
             $docs = $this->model::orderBy($order, $sort)->skip($skip)->whereBetween('price', [$minPrice, $maxPrice])->with('variant')->take($per_page)->get();

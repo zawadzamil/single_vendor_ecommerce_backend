@@ -55,7 +55,7 @@ class ProductController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $fillableChecker = $this->fillableChecker->check([
             'name',
@@ -76,6 +76,25 @@ class ProductController extends Controller
         if (!$idValidationResult['success']) {
             return $this->responseHelper->error($idValidationResult['message'], 404);
         }
+        // Color Validation
+        if ($request->has('color')) {
+            $color = $request->color;
+            foreach ($color as $item) {
+                if (!in_array($item, ALLOWED_COLORS)) {
+                    return response()->json(['message' => 'Invalid color ' . $item], 400);
+                }
+            }
+        }
+        // Sizes Vlidations
+        if ($request->has('size')) {
+            $sizes = $request->size;
+            foreach ($sizes as $item) {
+                if (!in_array($item, ALLOWED_SIZES)) {
+                    return response()->json(['message' => 'Invalid size ' . $item], 400);
+                }
+            }
+        }
+
         try {
             $product = $this->dbHelper->createDocument([
                 'name' => $request->name,
@@ -91,6 +110,7 @@ class ProductController extends Controller
 
             if ($product->save()) {
                 $varientData = $request->only('color', 'size');
+
 
                 $varient = tap(ProductVariation::create([
                     'product_id' => $product->id,
@@ -162,7 +182,7 @@ class ProductController extends Controller
      * @param \App\Models\Product $product
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request)
+    public function update(Request $request): \Illuminate\Http\JsonResponse
     {
         $id = $request->query('id');
         if (!$id) {
@@ -172,6 +192,26 @@ class ProductController extends Controller
         $product = $this->dbHelper->getDocument($id);
         if (!$product) {
             return $this->responseHelper->error('Product ' . config('messages.not_found'), 404);
+        }
+
+            // Color Validation
+        if ($request->has('color')) {
+            $color = $request->color;
+            foreach ($color as $item) {
+                if (!in_array($item, ALLOWED_COLORS)) {
+                    return response()->json(['message' => 'Invalid color ' . $item], 400);
+                }
+            }
+        }
+
+        // Sizes Validation
+        if ($request->has('size')) {
+            $sizes = $request->size;
+            foreach ($sizes as $item) {
+                if (!in_array($item, ALLOWED_SIZES)) {
+                    return response()->json(['message' => 'Invalid size ' . $item], 400);
+                }
+            }
         }
 
         $idMap = [
@@ -207,7 +247,7 @@ class ProductController extends Controller
                 ]);
                 $varient->makeHidden(['product_id', 'id']);
 
-                $product->varients = $varient;
+                //                $product->varients = $varient;
             }
             return $this->responseHelper->updated($product, 'Product');
         } catch (\Exception $e) {
