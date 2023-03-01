@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\GenderEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,8 +18,7 @@ class ProductStock extends Model
     protected $fillable = [
         'product_id',
         'quantity',
-        'reserved_quantity',
-        'created_by'
+        'reserved_quantity'
     ];
     protected $hidden = ['created_by', 'created_at', 'updated_at', 'deleted_at'];
 

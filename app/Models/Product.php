@@ -65,6 +65,7 @@ class Product extends Model
         return $this->hasOne(ProductVariation::class);
     }
 
+    // Stock Management
     public function stock(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(ProductStock::class);
@@ -87,5 +88,11 @@ class Product extends Model
     public function availableStock()
     {
         return $this->stock->available_quantity();
+    }
+
+    // Image
+    public function image(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Image::class);
     }
 }

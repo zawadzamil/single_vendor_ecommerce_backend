@@ -8,6 +8,7 @@ use App\Helpers\FillableChecker;
 use App\Helpers\ResponseHelper;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Image;
 use App\Models\Offer;
 use App\Models\Product;
 use App\Models\ProductStock;
@@ -16,6 +17,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -57,6 +59,7 @@ class ProductController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
+    // FIXME: NEED DATABASE TRANSACTION
     public function store(Request $request): JsonResponse
     {
         $fillableChecker = $this->fillableChecker->check([
@@ -99,7 +102,10 @@ class ProductController extends Controller
             }
         }
 
+
         try {
+
+            // Create Product
             $product = $this->dbHelper->createDocument([
                 'name' => $request->name,
                 'price' => $request->price,
@@ -113,6 +119,23 @@ class ProductController extends Controller
             ]);
 
             if ($product->save()) {
+                // Image Upload
+                if ($request->has('images')) {
+                    $files = $request->file('images');
+                    $primary = true;
+                    foreach ($files as $item) {
+                        $filename = rand() . '.' . $item->getClientOriginalExtension();
+                        Storage::disk('public')->putFileAs('images/products', $item, $filename);
+                        $url = Storage::url('images/products/' . $filename);
+                        $image = new Image([
+                            'url' => $url,
+                            'isPrimary' => $primary,
+                            'product_id' => $product->id
+                        ]);
+                        $primary = false;
+                        $image->save();
+                    }
+                }
                 // Add Variant
                 $varientData = $request->only('color', 'size');
 
@@ -133,6 +156,7 @@ class ProductController extends Controller
                 ]);
                 $product->stock()->save($productStock);
             }
+            $images = $product->image;
             return $this->responseHelper->created($product, 'Product');
 
         } catch (\Exception $e) {
@@ -233,6 +257,7 @@ class ProductController extends Controller
             return $this->responseHelper->error($idValidationResult['message'], 404);
         }
 
+
         try {
             $product = $this->dbHelper->updateDocument($id, [
                 "name" => $request->name ?? $product->name,
@@ -245,6 +270,21 @@ class ProductController extends Controller
                 "gender" => $request->gender ?? $product->gender,
             ]);
             if ($product->save()) {
+                if ($request->has('images')) {
+                    $files = $request->file('images');
+                    foreach ($files as $item) {
+                        $filename = rand() . '.' . $item->getClientOriginalExtension();
+                        Storage::disk('public')->putFileAs('images/products', $item, $filename);
+                        $url = Storage::url('images/products/' . $filename);
+                        $image = new Image([
+                            'url' => $url,
+                            'isPrimary' => false,
+                            'product_id' => $product->id
+                        ]);
+                        $image->save();
+                    }
+                    $images = $product->image;
+                }
                 $varientData = $request->only('color', 'size');
 
                 $varient = $product->variant;
