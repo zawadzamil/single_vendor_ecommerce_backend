@@ -10,8 +10,10 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Offer;
 use App\Models\Product;
+use App\Models\ProductStock;
 use App\Models\ProductVariation;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -52,20 +54,22 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request): \Illuminate\Http\JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $fillableChecker = $this->fillableChecker->check([
             'name',
             'price',
-            'slug'
+            'slug',
+            'quantity'
         ], $request);
         if (!$fillableChecker['success']) {
             return $this->responseHelper->error($fillableChecker['message'], 400);
         }
 
+        // Validate Relational Ids
         $idMap = [
             'category_id' => Category::class,
             'brand_id' => Brand::class,
@@ -85,7 +89,7 @@ class ProductController extends Controller
                 }
             }
         }
-        // Sizes Vlidations
+        // Sizes Validations
         if ($request->has('size')) {
             $sizes = $request->size;
             foreach ($sizes as $item) {
@@ -109,8 +113,8 @@ class ProductController extends Controller
             ]);
 
             if ($product->save()) {
+                // Add Variant
                 $varientData = $request->only('color', 'size');
-
 
                 $varient = tap(ProductVariation::create([
                     'product_id' => $product->id,
@@ -122,6 +126,12 @@ class ProductController extends Controller
                 });
 
                 $product->varients = $varient;
+
+                // Add Stock
+                $productStock = new ProductStock([
+                    'quantity' => $request->quantity,
+                ]);
+                $product->stock()->save($productStock);
             }
             return $this->responseHelper->created($product, 'Product');
 
@@ -135,10 +145,10 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\Product $product
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function show(Request $request): \Illuminate\Http\JsonResponse
+    public function show(Request $request): JsonResponse
     {
         $idValidate = $this->dbHelper->findByIdValidate($request);
 
@@ -167,7 +177,7 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\Product $product
+     * @param Product $product
      * @return \Illuminate\Http\Response
      */
     public function edit(Product $product)
@@ -178,11 +188,10 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Product $product
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function update(Request $request): \Illuminate\Http\JsonResponse
+    public function update(Request $request): JsonResponse
     {
         $id = $request->query('id');
         if (!$id) {
@@ -194,7 +203,7 @@ class ProductController extends Controller
             return $this->responseHelper->error('Product ' . config('messages.not_found'), 404);
         }
 
-            // Color Validation
+        // Color Validation
         if ($request->has('color')) {
             $color = $request->color;
             foreach ($color as $item) {
@@ -234,7 +243,6 @@ class ProductController extends Controller
                 "brand_id" => $request->brand_id ?? $product->brand_id,
                 "offer_id" => $request->offer_id ?? $product->offer_id,
                 "gender" => $request->gender ?? $product->gender,
-
             ]);
             if ($product->save()) {
                 $varientData = $request->only('color', 'size');
@@ -248,6 +256,10 @@ class ProductController extends Controller
                 $varient->makeHidden(['product_id', 'id']);
 
                 //                $product->varients = $varient;
+                $stock = $product->stock();
+                $stock->update([
+                    'quantity' => $request->quantity ?? $product->stock()->quantity,
+                ]);
             }
             return $this->responseHelper->updated($product, 'Product');
         } catch (\Exception $e) {
@@ -259,10 +271,10 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Product $product
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function destroy(Request $request): \Illuminate\Http\JsonResponse
+    public function destroy(Request $request): JsonResponse
     {
         $id = $request->query('id');
         if (!$id) {
@@ -280,12 +292,12 @@ class ProductController extends Controller
     /**
      * Get List of products.
      *
-     * @param \App\Models\Product $product
-     * @return \Illuminate\Http\JsonResponse
-     **/
+     * @param Request $request
+     * @return JsonResponse
+     */
 
     //Get All products
-    public function all(Request $request): \Illuminate\Http\JsonResponse
+    public function all(Request $request): JsonResponse
     {
         try {
             $products = $this->dbHelper->getProducts($request);

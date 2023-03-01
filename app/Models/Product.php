@@ -60,7 +60,32 @@ class Product extends Model
     {
         return $this->belongsTo(Offer::class);
     }
-    public  function variant(){
+    public  function variant(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
         return $this->hasOne(ProductVariation::class);
+    }
+
+    public function stock(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ProductStock::class);
+    }
+    public function reserveStock($quantity)
+    {
+        return $this->stock->reserve($quantity);
+    }
+
+    public function unreserveStock($quantity)
+    {
+        return $this->stock->unreserve($quantity);
+    }
+
+    public function fulfillStock($quantity)
+    {
+        return $this->stock->fulfill($quantity);
+    }
+
+    public function availableStock()
+    {
+        return $this->stock->available_quantity();
     }
 }

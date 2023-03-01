@@ -39,7 +39,7 @@ class ValidationMiddleware
             'minPrice' => 'required|int|max:999999999|min:0',
             'maxPrice' => 'required|int|max:999999999|min:0',
             'point' => 'required||numeric|gt:0|max:5',
-            'quantity' => 'required|int|max:9999999|min:0',
+            'quantity' => 'required|int|max:9999999|min:1',
             'duration' => 'required|string|max:100|min:2',
             'description' => 'required|string|min:2|max:10000',
             'details' => 'required|string|min:2|max:1000',

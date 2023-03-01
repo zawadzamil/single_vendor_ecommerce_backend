@@ -136,8 +136,7 @@ class dbHelper
             }
 
 
-        }
-        else {
+        } else {
             if ($request->has('color') || $request->has('size')) {
                 $docs = $this->model::where($filter)->orderBy($order, $sort)
                     ->skip($skip)
