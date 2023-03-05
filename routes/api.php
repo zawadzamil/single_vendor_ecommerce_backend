@@ -101,4 +101,9 @@ Route::get('/test',function() {
     return response()->json(['Hello Raihan']);
 });
 
+// Default Route
+Route::fallback(function () {
+    return response()->json(['message' => 'Route not found'], 404);
+});
+
 

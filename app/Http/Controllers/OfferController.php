@@ -105,11 +105,33 @@ class OfferController extends Controller
      *
      * @param Request $request
      * @param  \App\Models\Offer  $offer
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(Request $request, Offer $offer)
+    public function update(Request $request): JsonResponse
     {
-        //
+        $idValidate = $this->dbHelper->findByIdValidate($request);
+
+        if (!$idValidate['success']) {
+            return $this->responseHelper->error($idValidate['message'], $idValidate['status']);
+        }
+
+        $offer = $idValidate['data'];
+        try {
+            $offer->update([
+                'name'=> $request->input('name') ?? $offer->name,
+                'description' => $request->input('description') ?? $offer->description,
+                'amount' =>(int) $request->input('amount') ?? $offer->amount,
+                'start_date' => $request->input('startDate') ?? $offer->start_date,
+                'end_date' => $request->input('endDate') ?? $offer->end_date
+            ]);
+
+            return $this->responseHelper->updated($offer,'Offer');
+        }
+        catch (Exception $e) {
+            return $this->responseHelper->error($e->errorInfo[2] ?? $e->getMessage(), 400);
+        }
+
+
     }
 
     /**
