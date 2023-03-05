@@ -29,7 +29,7 @@ class ProductController extends Controller
     {
 
         $this->dbHelper = new dbHelper(new Product());
-        $this->fillableChecker = new FillableChecker(new User());
+        $this->fillableChecker = new FillableChecker(new Product());
         $this->responseHelper = new ResponseHelper();
     }
 

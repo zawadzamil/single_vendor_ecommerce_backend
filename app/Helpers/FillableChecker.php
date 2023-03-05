@@ -13,7 +13,7 @@ class FillableChecker
     }
 
 
-    public function check($fillableFields,$request)
+    public function check($fillableFields,$request): array
     {
         $missingFields = array_filter($fillableFields, function ($field) use ($request) {
             return empty($request->input($field));

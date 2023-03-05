@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariationController;
 use App\Http\Controllers\RoleController;
@@ -58,7 +60,7 @@ Route::group(['prefix' => 'brand'], function () {
 // Categories Routes
 Route::group(['prefix' => 'category'], function () {
     Route::post('/create', [CategoryController::class,'store'])->middleware('jwt.verify', 'permission:CREATE_CATEGORY');
-    Route::post('/update', [CategoryController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_CATEGORY');
+    Route::patch('/update', [CategoryController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_CATEGORY');
     Route::delete('/delete', [CategoryController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_CATEGORY');
     Route::get('/', [CategoryController::class,'show']);
     Route::get('/list', [CategoryController::class, 'all']);
@@ -71,6 +73,9 @@ Route::group(['prefix' => 'product'], function () {
     Route::delete('/delete', [ProductController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_PRODUCT');
     Route::get('/', [ProductController::class,'show']);
     Route::get('/list', [ProductController::class, 'all']);
+
+    Route::delete('/image/delete', [ImageController::class, 'deleteProductImage']);
+    Route::patch('/image/primary', [ImageController::class, 'makePrimaryImage']);
 });
 
 // Product Variant Routes
@@ -82,5 +87,18 @@ Route::group(['prefix' => 'product-variant'], function () {
     Route::get('/list', [ProductVariationController::class, 'all']);
 });
 
+// Offer Routes
+Route::group(['prefix' => 'offer'], function() {
+    Route::post('/create', [OfferController::class,'store'])->middleware('jwt.verify', 'permission:CREATE_OFFER');
+    Route::patch('/update', [OfferController::class,'update'])->middleware('jwt.verify', 'permission:EDIT_OFFER');
+    Route::delete('/delete', [OfferController::class, 'destroy'])->middleware('jwt.verify','permission:DELETE_OFFER');
+    Route::get('/', [OfferController::class, 'show']);
+    Route::get('/list', [OfferController::class,'all'])->middleware('jwt.verify','permission:VIEW_ALL_OFFERS');
+});
+
+// Test Route
+Route::get('/test',function() {
+    return response()->json(['Hello Raihan']);
+});
 
 
