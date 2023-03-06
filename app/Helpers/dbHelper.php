@@ -113,7 +113,8 @@ class dbHelper
                         $query->whereJsonContains('color', $color)
                             ->whereJsonContains('size', $size);
                     })
-                    ->with('variant')->take($per_page)->get();
+                    ->with('variant')
+                    ->take($per_page)->get();
 
                 $total = $this->model::orderBy($order, $sort)
                     ->whereBetween('price', [$minPrice, $maxPrice])
@@ -145,7 +146,8 @@ class dbHelper
                         $query->whereJsonContains('color', $color)
                             ->whereJsonContains('size', $size);
                     })
-                    ->with('variant')->take($per_page)->get();
+                    ->with('variant')
+                    ->take($per_page)->get();
 
                 $total = $this->model::where($filter)->orderBy($order, $sort)
                     ->whereBetween('price', [$minPrice, $maxPrice])
@@ -159,12 +161,21 @@ class dbHelper
                     ->skip($skip)
                     ->whereBetween('price', [$minPrice, $maxPrice])
                     ->with('variant')
+                    ->with('stock')
                     ->take($per_page)
                     ->get();
 
                 $total = $this->model::where($filter)->orderBy($order, $sort)
                     ->whereBetween('price', [$minPrice, $maxPrice])
                     ->count();
+            }
+        }
+
+        foreach ($docs as $item){
+            if($item->offer){
+               if($item->offer->status){
+                   $item->offerPrice = round($item->price * ($item->offer['discount'] /100));
+               }
             }
         }
 

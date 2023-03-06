@@ -30,7 +30,7 @@ class Product extends Model
     protected $casts = [
         'gender' => GenderEnum::class
     ];
-    protected $hidden = ['created_by', 'created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = ['created_by', 'created_at', 'updated_at', 'deleted_at','offer'];
 
     protected static function boot()
     {

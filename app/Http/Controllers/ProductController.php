@@ -297,8 +297,9 @@ class ProductController extends Controller
 
                 //                $product->varients = $varient;
                 $stock = $product->stock();
+                $quantity = $stock->quantity ?? 0;
                 $stock->update([
-                    'quantity' => $request->quantity ?? $product->stock()->quantity,
+                    'quantity' => $request->quantity ?? $quantity,
                 ]);
             }
             return $this->responseHelper->updated($product, 'Product');

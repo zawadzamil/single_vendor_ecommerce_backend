@@ -213,4 +213,25 @@ class OfferController extends Controller
         $limit = ceil($total / $per_page);
         return ["data" => $offers, "total" => $total, "per_page" => $per_page, "limit" => $limit];
     }
+
+    // Active Offers
+    public function allActive(Request $request){
+        $per_page = isset($request->per_page) ? (int)$request->per_page : 5;
+        $page = $request->query('page') ?? 1;
+        $sort = $request->query('sort') ?? 'desc';
+        $order = $request->query('orderBy') ?? 'created_at';
+        $skip = ($page - 1) * $per_page;
+        $filter = [
+            'status' => 1
+        ];
+
+        $offers = Offer::where($filter)->orderBy($order,$sort)->skip($skip)->take($per_page)->get();
+        $total = Offer::where($filter)->count();
+        if (count($offers) < 1) {
+            return $this->responseHelper->error(config('messages.noOffers'), 404);
+        }
+
+        $limit = ceil($total / $per_page);
+        return ["data" => $offers, "total" => $total, "per_page" => $per_page, "limit" => $limit];
+    }
 }
