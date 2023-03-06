@@ -10,4 +10,5 @@ return [
     'parent_category_same' => 'Child category cannot be the same as parent category',
     'cant_delete_category'=>'Cannot delete this category. It has children categories',
     'activeOrDeactivate'=> 'Required "active = true/false" in query.',
+    'noOffers'=>'No offers found.',
 ];
