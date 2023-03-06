@@ -34,7 +34,10 @@ class Offer extends Model
         'status'
     ];
 
-    public function products(){
+    public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(Product::class);
     }
+
+    protected $hidden = ['created_by', 'created_at', 'updated_at', 'deleted_at'];
 }

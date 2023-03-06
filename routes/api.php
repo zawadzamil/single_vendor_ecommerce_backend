@@ -93,7 +93,10 @@ Route::group(['prefix' => 'offer'], function() {
     Route::patch('/update', [OfferController::class,'update'])->middleware('jwt.verify', 'permission:EDIT_OFFER');
     Route::delete('/delete', [OfferController::class, 'destroy'])->middleware('jwt.verify','permission:DELETE_OFFER');
     Route::get('/', [OfferController::class, 'show']);
-    Route::get('/list', [OfferController::class,'all'])->middleware('jwt.verify','permission:VIEW_ALL_OFFERS');
+    Route::get('/list/private', [OfferController::class,'all'])->middleware('jwt.verify','permission:VIEW_ALL_OFFERS');
+    Route::get('/list', [OfferController::class,'allActive']);
+    // Active Offer
+    Route::patch('/activateOrDeactivate', [OfferController::class,'activateOrDeactivate'])->middleware('jwt.verify','permission:EDIT_OFFER');
 });
 
 // Test Route

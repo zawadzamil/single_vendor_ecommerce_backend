@@ -82,11 +82,19 @@ class OfferController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Offer  $offer
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function show(Offer $offer)
+    public function show(Request $request): JsonResponse
     {
-        //
+        $idValidate = $this->dbHelper->findByIdValidate($request);
+
+        if (!$idValidate['success']) {
+            return $this->responseHelper->error($idValidate['message'], $idValidate['status']);
+        }
+
+        $offer = $idValidate['data'];
+
+        return $this->responseHelper->success($offer);
     }
 
     /**
@@ -137,11 +145,42 @@ class OfferController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Offer  $offer
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function destroy(Offer $offer)
+    public function destroy(Request $request): JsonResponse
     {
-        //
+        $idValidate = $this->dbHelper->findByIdValidate($request);
+
+        if (!$idValidate['success']) {
+            return $this->responseHelper->error($idValidate['message'], $idValidate['status']);
+        }
+
+        $this->dbHelper->deleteDocument($request->query('id'));
+
+        return $this->responseHelper->successWithMessage('Offer'. config('messages.deleted'));
+    }
+
+    // Active offer
+    public function activateOrDeactivate(Request $request): JsonResponse
+    {
+        $idValidate = $this->dbHelper->findByIdValidate($request);
+
+        if (!$idValidate['success']) {
+            return $this->responseHelper->error($idValidate['message'], $idValidate['status']);
+        }
+        $offer = $idValidate['data'];
+
+        if(!$request->has('active')){
+            return $this->responseHelper->error(config('messages.activeOrDeactivate'),400);
+        }
+
+        $active = $request->query('active');
+
+        $offer->update([
+            'status' => $active? 1:0,
+        ]);
+
+        return $this->responseHelper->successWithMessageAndData('Operation Successful.', $offer);
     }
 }

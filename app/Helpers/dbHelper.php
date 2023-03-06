@@ -27,7 +27,7 @@ class dbHelper
         return $doc;
     }
 
-    public function deleteDocument($id)
+    public function deleteDocument($id): void
     {
         $doc = $this->model->find($id);
         $doc->delete();
