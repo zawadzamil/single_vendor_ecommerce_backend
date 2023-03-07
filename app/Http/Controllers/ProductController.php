@@ -14,10 +14,12 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\ProductVariation;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use TypeError;
 
 class ProductController extends Controller
 {
@@ -352,5 +354,49 @@ class ProductController extends Controller
     }
 
     // Assign Offer
+    public function assignOffer(Request $request): JsonResponse
+    {
+
+        $fillableChecker = $this->fillableChecker->check([
+            'products',
+            'offerId',
+        ], $request);
+        if (!$fillableChecker['success']) {
+            return $this->responseHelper->error($fillableChecker['message'], 400);
+        }
+        try {
+            $products = $request->products;
+            if (count($products) == 0) {
+                return $this->responseHelper->error(config('messages.productRequired'), 400);
+            }
+        } catch (TypeError  $e) {
+            return $this->responseHelper->error('products must be an array of ids', 400);
+        }
+        $offer = Offer::find($request->offerId);
+        if (!$offer) {
+            return $this->responseHelper->error(config('messages.invalid_offer'), 400);
+        }
+
+        $validatedIds = collect($products)->filter(function ($id) {
+            $product = Product::find($id);
+            if (!$product) {
+                return false;
+            }
+            return true;
+        });
+
+        $invalidIds = collect($products)->diff($validatedIds);
+
+        if (!$invalidIds->isEmpty()) {
+            return $this->responseHelper->error('Invalid product ids: ' . $invalidIds->implode(', '), 404);
+        }
+
+
+        Product::whereIn('id', $validatedIds)->update(['offer_id' => $request->offerId]);
+
+        return $this->responseHelper->successWithMessage('Offer assigned successfully.');
+
+    }
+
 
 }

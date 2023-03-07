@@ -11,4 +11,6 @@ return [
     'cant_delete_category'=>'Cannot delete this category. It has children categories',
     'activeOrDeactivate'=> 'Required "active = true/false" in query.',
     'noOffers'=>'No offers found.',
+    'productRequired'=> 'Minimum one product is required.',
+    'invalid_offer'=> 'Invalid offer id',
 ];
