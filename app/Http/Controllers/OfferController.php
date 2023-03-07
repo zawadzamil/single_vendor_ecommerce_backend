@@ -123,11 +123,12 @@ class OfferController extends Controller
         }
 
         $offer = $idValidate['data'];
+
         try {
             $offer->update([
                 'name' => $request->input('name') ?? $offer->name,
                 'description' => $request->input('description') ?? $offer->description,
-                'discount' => (int)$request->input('discount') ?? $offer->discount,
+                'discount' => $request->input('discount')? (int) $request->input('discount'): $offer->discount,
                 'start_date' => $request->input('startDate') ?? $offer->start_date,
                 'end_date' => $request->input('endDate') ?? $offer->end_date
             ]);

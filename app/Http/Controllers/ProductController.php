@@ -350,4 +350,7 @@ class ProductController extends Controller
             return $this->responseHelper->error($e->getMessage(), 400);
         }
     }
+
+    // Assign Offer
+
 }

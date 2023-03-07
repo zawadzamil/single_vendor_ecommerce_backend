@@ -174,7 +174,14 @@ class dbHelper
         foreach ($docs as $item){
             if($item->offer){
                if($item->offer->status){
-                   $item->offerPrice = round($item->price * ($item->offer['discount'] /100));
+                   $start = $item->offer->start_date;
+                   $end = $item->offer->end_date;
+                   $current = date('Y-m-d H:i:s');
+
+                  if($current >= $start && $current <= $end){
+                      $item->offerPrice = round($item->price * ($item->offer['discount'] /100));
+                  }
+
                }
             }
         }

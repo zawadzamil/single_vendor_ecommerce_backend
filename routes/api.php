@@ -97,6 +97,7 @@ Route::group(['prefix' => 'offer'], function() {
     Route::get('/list', [OfferController::class,'allActive']);
     // Active Offer
     Route::patch('/activateOrDeactivate', [OfferController::class,'activateOrDeactivate'])->middleware('jwt.verify','permission:EDIT_OFFER');
+    Route::post('/assign-offer', [ProductController::class,'assignOffer'])->middleware('jwt.verify','permission:ASSIGN_OFFER');
 });
 
 // Test Route
