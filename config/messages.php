@@ -13,4 +13,7 @@ return [
     'noOffers'=>'No offers found.',
     'productRequired'=> 'Minimum one product is required.',
     'invalid_offer'=> 'Invalid offer id',
+    'lowStock' => 'Product is low stock.',
+    'cartAdded' => 'Product has been added to cart.',
+    'unexpectedError' => 'Unexpected error occurred!'
 ];
