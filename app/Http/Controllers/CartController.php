@@ -43,7 +43,7 @@ class CartController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $fillables = ['product_id', 'quantity', 'price'];
         $checkFillables = $this->fillableChecker->check($fillables, $request);
@@ -54,6 +54,10 @@ class CartController extends Controller
         $product = Product::find($request->product_id);
         if (!$product) {
             return $this->responseHelper->error('Product ' . config('messages.not_found'), 404);
+        }
+
+        if ($request->quantity < 1) {
+            $this->responseHelper->error(config('messages.lowQuantity'), 400);
         }
 
         $user = Auth::user();
@@ -85,7 +89,7 @@ class CartController extends Controller
                 if ($existingCartItem) {
                     $quantity = $existingCartItem['quantity'] + $request['quantity'];
                     $existingCartItem->update([
-                        'quantity' => $quantity ,
+                        'quantity' => $quantity,
                         'total_price' => $quantity * $existingCartItem->price,
                     ]);
                 } else {
