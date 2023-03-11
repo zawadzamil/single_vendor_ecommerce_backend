@@ -15,5 +15,6 @@ return [
     'invalid_offer'=> 'Invalid offer id',
     'lowStock' => 'Product is low stock.',
     'cartAdded' => 'Product has been added to cart.',
-    'unexpectedError' => 'Unexpected error occurred!'
+    'unexpectedError' => 'Unexpected error occurred!',
+    'lowQuantity'=> 'Product quantity must be at least 1.',
 ];
