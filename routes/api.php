@@ -102,7 +102,7 @@ Route::group(['prefix' => 'offer'], function () {
 
 // Cart Routes
 Route::group(['prefix' => 'cart'], function () {
-    Route::get('/', [CartController::class, 'show'])->middleware('jwt.verify');
+    Route::get('/my-cart', [CartController::class, 'show'])->middleware('jwt.verify');
     Route::post('/create', [CartController::class, 'store'])->middleware('jwt.verify');
     Route::patch('/update', [CartController::class, 'update'])->middleware('jwt.verify');
     Route::delete('/delete', [CartController::class, 'destroy'])->middleware('jwt.verify');

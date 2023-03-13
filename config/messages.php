@@ -19,4 +19,5 @@ return [
     'lowQuantity'=> 'Product quantity must be at least 1.',
     'productNotFound'=>'Product not found.',
     'removeCart' => 'Product has been removed from cart.',
+    'emptyCart'=> 'Cart is empty.',
 ];

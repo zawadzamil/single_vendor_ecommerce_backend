@@ -117,7 +117,7 @@ class CartController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param \App\Models\Cart $cart
+     * @param Cart $cart
      * @return JsonResponse
      */
     public function update(Request $request): JsonResponse
@@ -178,18 +178,26 @@ class CartController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\Cart $cart
-     * @return \Illuminate\Http\Response
+     * @param Cart $cart
+     * @return JsonResponse
      */
-    public function show(Cart $cart)
+    public function show(Cart $cart): JsonResponse
     {
-        //
+        $user = Auth::user();
+        $cart = Cart::where('customer_id', $user->id)->first();
+        $cartItems = CartItem::where('cart_id', $cart->id)->get();
+        if($cartItems->count() == 0){
+            return $this->responseHelper->error(config('messages.emptyCart'), 403);
+        }
+        $data = ['items'=>$cartItems,'total'=>$cartItems->count()];
+        return $this->responseHelper->success($data);
+
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\Cart $cart
+     * @param Cart $cart
      * @return \Illuminate\Http\Response
      */
     public function edit(Cart $cart)
@@ -200,7 +208,7 @@ class CartController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Cart $cart
+     * @param Cart $cart
      * @return \Illuminate\Http\Response
      */
     public function destroy(Cart $cart)
