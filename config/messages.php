@@ -17,4 +17,6 @@ return [
     'cartAdded' => 'Product has been added to cart.',
     'unexpectedError' => 'Unexpected error occurred!',
     'lowQuantity'=> 'Product quantity must be at least 1.',
+    'productNotFound'=>'Product not found.',
+    'removeCart' => 'Product has been removed from cart.',
 ];

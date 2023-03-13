@@ -22,8 +22,8 @@ class CartController extends Controller
     public function __construct()
     {
 
-        $this->dbHelper = new dbHelper(new Cart());
-        $this->fillableChecker = new FillableChecker(new Cart());
+        $this->dbHelper = new dbHelper(new CartItem());
+        $this->fillableChecker = new FillableChecker(new CartItem());
         $this->responseHelper = new ResponseHelper();
     }
 
@@ -118,11 +118,51 @@ class CartController extends Controller
      *
      * @param Request $request
      * @param \App\Models\Cart $cart
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(Request $request, Cart $cart)
+    public function update(Request $request): JsonResponse
     {
-        //
+        $fillables = ['cartItemId','quantity'];
+        $checkFillables = $this->fillableChecker->check($fillables,$request);
+        if(!$checkFillables['success']){
+            return $this->responseHelper->error($checkFillables['message'],400);
+        }
+
+        $cartItem = $this->dbHelper->getDocument($request->cartItemId);
+        if(!$cartItem){
+            return $this->responseHelper->error('Cart Item '.config('messages.not_found'),404);
+        }
+        $product = Product::find($cartItem->product_id);
+        if(!$product){
+            return $this->responseHelper->error(config('messages.productNotFound'),404);
+        }
+
+        $oldQuantity = $cartItem->quantity;
+        $newQuantity = $request->quantity;
+
+        $quantityDiff = $newQuantity - $oldQuantity;
+
+        if($quantityDiff > 0){
+            if($product->reserveStock($quantityDiff)){
+                $cartItem->update([
+                    'quantity' => $request->quantity ,
+                    'total_price' => $cartItem->price * $request->input('quantity'),
+                ]);
+            }
+            else{
+                return $this->responseHelper->error(config('messages.lowStock'), 403);
+            }
+        }
+        elseif($quantityDiff < 0){
+            $product->unreserveStock(abs($quantityDiff));
+            $cartItem->update([
+                'quantity' => $request->quantity ,
+                'total_price' => $cartItem->price * $request->input('quantity'),
+            ]);
+        }
+       return $this->responseHelper->updated($cartItem,'Cart');
+
+
     }
 
     /**
@@ -166,5 +206,40 @@ class CartController extends Controller
     public function destroy(Cart $cart)
     {
         //
+    }
+
+    // Remove Item from Cart
+    public function remove(Request $request): JsonResponse
+    {
+       $fillables = ['cartItemId'];
+       $checkFillables = $this->fillableChecker->check($fillables,$request);
+       if(!$checkFillables['success']){
+           return $this->responseHelper->error($checkFillables['message'],400);
+       }
+
+       $cartItem = $this->dbHelper->getDocument($request->cartItemId);
+       if(!$cartItem){
+           return $this->responseHelper->error('Cart Item '.config('messages.not_found'),404);
+       }
+
+       $productId = $cartItem->product_id;
+       $product = Product::find($productId);
+       if(!$product){
+           return $this->responseHelper->error(config('messsages.productNotFound'),404);
+       }
+
+      try{
+          $product->unreserveStock($cartItem->quantity);
+
+          $this->dbHelper->deleteDocument($cartItem->id);
+
+      }
+       catch (\Exception $e){
+           return $this->responseHelper->error($e->getMessage(),400);
+       }
+
+       return $this->responseHelper->successWithMessage('Cart Item '.config('messages.removeCart'));
+
+
     }
 }

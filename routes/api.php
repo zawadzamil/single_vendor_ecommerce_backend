@@ -106,6 +106,7 @@ Route::group(['prefix' => 'cart'], function () {
     Route::post('/create', [CartController::class, 'store'])->middleware('jwt.verify');
     Route::patch('/update', [CartController::class, 'update'])->middleware('jwt.verify');
     Route::delete('/delete', [CartController::class, 'destroy'])->middleware('jwt.verify');
+    Route::delete('/remove-item', [CartController::class, 'remove'])->middleware('jwt.verify');
 });
 
 // Test Route
