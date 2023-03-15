@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\OfferController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariationController;
 use App\Http\Controllers\RoleController;
@@ -44,7 +45,7 @@ Route::group(['prefix' => 'role'], function () {
     Route::post('/create', [RoleController::class, 'create'])->middleware('jwt.verify', 'permission:CREATE_ROLE');
     Route::patch('/update', [RoleController::class, 'update'])->middleware('jwt.verify', 'permission:EDIT_ROLE');
     Route::delete('/delete', [RoleController::class, 'destroy']);
-//    Route::post('/assign', [RoleController::class,'assign']);
+    //    Route::post('/assign', [RoleController::class,'assign']);
 });
 
 // Brand Routes
@@ -54,7 +55,6 @@ Route::group(['prefix' => 'brand'], function () {
     Route::delete('/delete', [BrandController::class, 'destroy'])->middleware('jwt.verify', 'permission:DELETE_BRAND');
     Route::get('/', [BrandController::class, 'show']);
     Route::get('/list', [BrandController::class, 'all']);
-
 });
 
 // Categories Routes
@@ -109,6 +109,15 @@ Route::group(['prefix' => 'cart'], function () {
     Route::delete('/remove-item', [CartController::class, 'remove'])->middleware('jwt.verify');
 });
 
+Route::group(['prefix' => 'order'], function () {
+    Route::get('/', [OrderController::class, 'show'])->middleware('jwt.verify');
+    Route::post('/create', [OrderController::class, 'store'])->middleware('jwt.verify');
+    Route::patch('/update', [OrderController::class, 'update'])->middleware('jwt.verify');
+    Route::delete('/delete', [OrderController::class, 'delete'])->middleware('jwt.verify');
+    Route::get('/my-orders', [OrderController::class, 'myOrders'])->middleware('jwt.verify');
+    //Private Route
+    Route::get('/all', [OrderController::class, 'all'])->middleware('jwt.verify', 'permission:VIEW_ALL_ORDERS');
+});
 // Test Route
 Route::get('/test', function () {
     return response()->json(['Hello Raihan']);
@@ -118,5 +127,3 @@ Route::get('/test', function () {
 Route::fallback(function () {
     return response()->json(['message' => 'Route not found'], 404);
 });
-
-
