@@ -61,12 +61,14 @@ class CartController extends Controller
         }
 
         $user = Auth::user();
-        $existingCart = Cart::where('customer_id', $user->id)->first();
+        $customer = $user->customer;
+        $existingCart = Cart::where('customer_id', $customer->id)->first();
+
         if (!$existingCart) {
             try {
-                $cart = $this->dbHelper->createDocument([
-                    'customer_id' => $user->id,
-                    'customer_name' => $user->name,
+                $cart =Cart::create([
+                    'customer_id' => $customer->id,
+                    'customer_name' => $customer->name,
                 ]);
             } catch (\Exception $e) {
                 return $this->responseHelper->error($e->errorInfo[2] ?? $e->getMessage(), 400);
@@ -181,13 +183,14 @@ class CartController extends Controller
      * @param Cart $cart
      * @return JsonResponse
      */
-    public function show(Cart $cart): JsonResponse
+    public function show(): JsonResponse
     {
         $user = Auth::user();
-        $cart = Cart::where('customer_id', $user->id)->first();
+        $customer = $user->customer;
+        $cart = Cart::where('customer_id', $customer->id)->first();
         $cartItems = CartItem::where('cart_id', $cart->id)->get();
         if($cartItems->count() == 0){
-            return $this->responseHelper->error(config('messages.emptyCart'), 403);
+            return $this->responseHelper->error(config('messages.emptyCart'), 404);
         }
         $data = ['items'=>$cartItems,'total'=>$cartItems->count()];
         return $this->responseHelper->success($data);
