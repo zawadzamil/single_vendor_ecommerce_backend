@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Helpers\dbHelper;
 use App\Helpers\FillableChecker;
 use App\Helpers\ResponseHelper;
+use App\Models\Cart;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -61,13 +63,33 @@ class OrderController extends Controller
         $user = Auth::user();
         $customer = $user->customer;
 
+        // Get the customer cart
+        $cart = Cart::where('customer_id', $customer->id)->first();
+        if(!$cart) {
+            return $this->responseHelper->error(config('messages.emptyCart'),400);
+        }
+
+        // Cart Items
+        $cartItems = $cart->items;
+
+
         try {
             $order = $this->dbHelper->createDocument([
-                'customer_id' => $customer->id ?? 2,
+                'customer_id' => $customer->id ,
                 'total_amount' => (int)$request->input('total_amount'),
                 'order_date' => $request->input('order_date'),
                 'delivery_address' => $request->input('delivery_address'),
             ]);
+            if($order->save()) {
+                foreach($cartItems as $cartItem) {
+                    $orderItem = OrderItem::create([
+                        'order_id'=>$order->id,
+                        'product_id' => $cartItem->product_id,
+                        'quantity' =>$cartItem->quantity,
+                        'unit_price' => $cartItem->price
+                    ]);
+                }
+            }
             return $this->responseHelper->created($order,'Order');
         }
         catch (\Exception $e){

@@ -35,4 +35,9 @@ class Cart extends Model
       return  $this->belongsTo(Customer::class);
     }
 
+    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
 }

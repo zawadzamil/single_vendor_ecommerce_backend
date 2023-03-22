@@ -10,9 +10,19 @@ class CartItem extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
     protected $primaryKey = 'id';
     protected $keyType = 'string';
-    public $incrementing = false;
+    protected $fillable = [
+        'cart_id',
+        'product_id',
+        'quantity',
+        'price',
+        'size',
+        'color',
+        'total_price'
+    ];
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected static function boot()
     {
@@ -23,17 +33,10 @@ class CartItem extends Model
         });
     }
 
-    protected $fillable = [
-        'cart_id',
-        'product_id',
-        'quantity',
-        'price',
-        'size',
-        'color',
-        'total_price'
-    ];
-
-    protected $hidden = [ 'created_at', 'updated_at'];
+    public function cart(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Cart::class);
+    }
 
 
 }
